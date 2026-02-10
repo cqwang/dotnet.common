@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace dotmet.dotnet.common.TestCase
+namespace dotnet.dotnet.common.TestCase
 {
     class TestImage
     {

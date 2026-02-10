@@ -42,4 +42,13 @@ namespace dotnet.common.TestCase
     {
         public int Value { get; set; }
     }
+
+    public class Product
+    {
+        public int ProductID { get; set; }
+
+        public string Name { get; set; }
+
+        public string ShortName { get; set; }
+    }
 }

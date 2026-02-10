@@ -9,7 +9,7 @@ namespace dotnet.common.CollectionExt{
     /**
     * 
     **/
-    public class EntityListComparer
+    public class EntityListChangeFinder
     {
         /**
         *  新旧数据集比较，找出差集{New-Old}，方便去插入数据库
