@@ -1,0 +1,112 @@
+using System;
+using System.Collections.Generic;
+using System.DirectoryServices;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace dotnet.common.IISExt
+{
+    public class IISHelper
+    {
+        /// <summary>
+        /// 启动应用程序池
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="appPoolName"></param>
+        /// <returns></returns>
+        public static bool StartAppPool(string host, string appPoolName)
+        {
+            return RunAppPool(host, appPoolName, AppPoolOperationEnum.Start);
+        }
+
+        /// <summary>
+        /// 回收应用程序池
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="appPoolName"></param>
+        /// <returns></returns>
+        public static bool RecycleAppPool(string host, string appPoolName)
+        {
+            return RunAppPool(host, appPoolName, AppPoolOperationEnum.Recycle);
+        }
+
+        /// <summary>
+        /// 停止应用程序池
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="appPoolName"></param>
+        /// <returns></returns>
+        public static bool StopAppPool(string host, string appPoolName)
+        {
+            return RunAppPool(host, appPoolName, AppPoolOperationEnum.Stop);
+        }
+
+
+        /// <summary>
+        /// 获取IIS应用程序池目录
+        /// </summary>
+        /// <param name="host"></param>
+        /// <returns></returns>
+        private static string GetIISAppPoolPath(string host)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("IIS://");
+            sb.Append(host);
+            sb.Append("/W3SVC/AppPools");
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// 操作应用程序池
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="appPoolName"></param>
+        /// <param name="operation"></param>
+        /// <returns></returns>
+        private static bool RunAppPool(string host, string appPoolName, AppPoolOperationEnum operation)
+        {
+            string.Format("IIS://{0}/W3SVC/AppPools", host);
+            string method = GetAppPoolOperation(operation);
+            if (string.IsNullOrEmpty(method))
+                return false;
+
+            bool isSuccess = true;
+            try
+            {
+                string iisAppPoolPath = GetIISAppPoolPath(host);
+                DirectoryEntry iisAppPool = new DirectoryEntry(iisAppPoolPath);
+                DirectoryEntry appPool = iisAppPool.Children.Find(appPoolName, "IIsApplicationPool");
+                appPool.Invoke(method, null);
+                iisAppPool.CommitChanges();
+                iisAppPool.Close();
+            }
+            catch
+            {
+                isSuccess = false;
+            }
+
+            return isSuccess;
+        }
+
+        /// <summary>
+        /// 获取应用程序池操作
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <returns></returns>
+        private static string GetAppPoolOperation(AppPoolOperationEnum operation)
+        {
+            switch (operation)
+            {
+                case AppPoolOperationEnum.Start:
+                    return "Start";
+                case AppPoolOperationEnum.Recycle:
+                    return "Recycle";
+                case AppPoolOperationEnum.Stop:
+                    return "Stop";
+                default:
+                    return string.Empty;
+            }
+        }
+    }
+}
