@@ -1,0 +1,62 @@
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace dotnet.common.Syntax.ServiceStackRedis
+{
+    class ManualHotel
+    {
+        public int ResourceID { get; set; }
+
+        public int Capacity { get; set; }
+
+        public int StartDay { get; set; }
+
+        public int EndDay { get; set; }
+
+    }
+
+    class ManualHotelGroup
+    {
+        public int StartDay { get; set; }
+
+        public int EndDay { get; set; }
+
+        public List<ManualHotel> Hotels { get; set; }
+    }
+
+    public class ServieStackRedisTest {
+
+        public static void TestGetSet()
+        {
+            var group = new ManualHotelGroup()
+            {
+                StartDay = 1,
+                EndDay = 2,
+                Hotels = new List<ManualHotel>()
+                {
+                    new ManualHotel()
+                    {
+                        StartDay=1,
+                        EndDay=2,
+                        Capacity=2,
+                        ResourceID=111
+                    }
+                }
+            };
+
+            var redisDB = ConfigurationManager.AppSettings["RedisDB"] ?? string.Empty;
+            var key = string.Concat(redisDB, "_ManualHotelGroupForTest");
+            var provider = ServiceStackRedisProviderFactory.CreateProvider();
+            provider.SetAsync(key, group);
+            System.Threading.Thread.Sleep(2000);
+            var cachedGroup = provider.GetAsync<ManualHotelGroup>(key).Result;
+        }
+
+
+
+    }
+}
